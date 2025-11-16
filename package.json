@@ -1,0 +1,37 @@
+{
+  "name": "mcp-tauri-automation",
+  "version": "1.0.0",
+  "description": "MCP server for automating and interacting with Tauri desktop applications",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "mcp-tauri-automation": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "npm run build",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "tauri",
+    "automation",
+    "webdriver",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "webdriverio": "^9.2.14",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
