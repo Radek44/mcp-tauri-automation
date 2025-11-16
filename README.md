@@ -369,8 +369,6 @@ TAURI_WEBDRIVER_PORT=4445
 
 ## Examples
 
-See [examples/test-session.md](examples/test-session.md) for detailed usage scenarios.
-
 ### Basic Workflow
 
 ```typescript
