@@ -1,110 +1,41 @@
 # MCP Tauri Automation
 
-An MCP (Model Context Protocol) server that enables AI coding agents like Claude Code to automate and interact with Tauri desktop applications. This server provides tools for launching apps, capturing screenshots, interacting with UI elements, and executing Tauri IPC commands.
+> **Automate Tauri desktop apps with AI.** An MCP server that lets Claude Code test, debug, and interact with your Tauri applications through natural language.
 
-## Features
+## What is this?
 
-- **Application Lifecycle**: Launch and close Tauri applications programmatically
-- **UI Interaction**: Click elements, type text, and interact with the interface via CSS selectors
-- **Visual Feedback**: Capture screenshots with automatic base64 encoding for MCP clients
-- **State Management**: Query application state and wait for async UI updates
-- **IPC Integration**: Execute Tauri commands directly from AI agents
-- **Robust Error Handling**: Clear error messages and graceful cleanup
+Testing Tauri apps usually means:
+- ❌ Manually clicking through UIs for every change
+- ❌ Writing complex test scripts for simple interactions
+- ❌ Taking screenshots manually to debug visual issues
+- ❌ Switching between code editor and running app constantly
 
-## Table of Contents
+With this MCP server:
+- ✅ Ask Claude to "click the submit button and check the result"
+- ✅ Get instant screenshots of your app state
+- ✅ Test UI flows through natural language
+- ✅ Automate repetitive testing while you code
 
-- [Installation](#installation)
-- [Prerequisites](#prerequisites)
-- [Configuration](#configuration)
-- [Usage with Claude Code](#usage-with-claude-code)
-- [Available Tools](#available-tools)
-- [Architecture](#architecture)
-- [Troubleshooting](#troubleshooting)
-- [Examples](#examples)
+## Quick Start
 
-## Installation
-
-```bash
-# Clone or download this repository
-cd mcp-tauri-automation
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
-## Prerequisites
-
-### 1. Install tauri-driver
-
-The `tauri-driver` is required to automate Tauri applications via WebDriver protocol.
-
-**Using Cargo (recommended):**
+**1. Install tauri-driver**
 ```bash
 cargo install tauri-driver
 ```
 
-**Or download from releases:**
-Visit [tauri-driver releases](https://github.com/tauri-apps/tauri/releases) and download the appropriate binary for your platform.
-
-### 2. Start tauri-driver
-
-Before using this MCP server, you need to run tauri-driver:
-
+**2. Install this MCP server**
 ```bash
-# Default port 4444
-tauri-driver
-
-# Or specify a custom port
-tauri-driver --port 4445
+git clone <repo-url>
+cd mcp-tauri-automation
+npm install && npm run build
 ```
 
-Keep this running in a separate terminal while using the MCP server.
+**3. Add to your MCP config**
 
-### 3. Prepare Your Tauri Application
+<details>
+<summary><b>Claude Desktop</b></summary>
 
-Your Tauri app must be built for testing. For development:
-
-```bash
-cd your-tauri-app
-cargo build  # Or cargo build --release
-```
-
-The binary will be located at:
-- **Development**: `src-tauri/target/debug/your-app-name`
-- **Release**: `src-tauri/target/release/your-app-name`
-- **macOS**: Add `.app` extension (e.g., `your-app-name.app`)
-
-## Configuration
-
-The MCP server can be configured via environment variables:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `TAURI_APP_PATH` | Default path to Tauri application binary | None |
-| `TAURI_SCREENSHOT_DIR` | Directory to save screenshots | `./screenshots` |
-| `TAURI_WEBDRIVER_PORT` | Port where tauri-driver is running | `4444` |
-| `TAURI_DEFAULT_TIMEOUT` | Default timeout for element waits (ms) | `5000` |
-| `TAURI_DRIVER_PATH` | Path to tauri-driver binary | `tauri-driver` |
-
-### Example .env file:
-
-```bash
-TAURI_APP_PATH=/path/to/your/app/target/debug/your-app
-TAURI_SCREENSHOT_DIR=/tmp/screenshots
-TAURI_WEBDRIVER_PORT=4444
-TAURI_DEFAULT_TIMEOUT=10000
-```
-
-## Usage with Claude Code
-
-### 1. Configure MCP Server
-
-Add this server to your Claude Code MCP configuration file:
-
-**For Claude.app** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -113,15 +44,18 @@ Add this server to your Claude Code MCP configuration file:
       "command": "node",
       "args": ["/absolute/path/to/mcp-tauri-automation/dist/index.js"],
       "env": {
-        "TAURI_APP_PATH": "/path/to/your/tauri/app/binary",
-        "TAURI_WEBDRIVER_PORT": "4444"
+        "TAURI_APP_PATH": "/path/to/your/tauri/app/target/debug/your-app"
       }
     }
   }
 }
 ```
+</details>
 
-**For Claude Code CLI** (`~/.config/claude-code/mcp_config.json`):
+<details>
+<summary><b>Claude Code CLI</b></summary>
+
+Edit `~/.config/claude-code/mcp_config.json`:
 
 ```json
 {
@@ -130,329 +64,255 @@ Add this server to your Claude Code MCP configuration file:
       "command": "node",
       "args": ["/absolute/path/to/mcp-tauri-automation/dist/index.js"],
       "env": {
-        "TAURI_APP_PATH": "/path/to/your/tauri/app/binary"
+        "TAURI_APP_PATH": "/path/to/your/tauri/app/target/debug/your-app"
       }
     }
   }
 }
 ```
+</details>
 
-### 2. Start tauri-driver
+<details>
+<summary><b>Other MCP Clients</b></summary>
 
+Any MCP client that supports stdio transport can use this server. Pass the environment variables via the client's configuration mechanism.
+
+</details>
+
+**4. Start tauri-driver**
 ```bash
+# In a separate terminal, keep this running
 tauri-driver
 ```
 
-### 3. Use in Claude Code
-
-Once configured, you can ask Claude Code to interact with your Tauri app:
-
+**5. Use with Claude**
 ```
-Launch my Tauri app and click the "Start" button, then take a screenshot
-```
-
-```
-Open the app, type "Hello World" into the search box, and check what results appear
+Launch my Tauri app, click the "Start" button, and take a screenshot
 ```
 
 ## Available Tools
 
-### launch_app
+| Tool | Description |
+|------|-------------|
+| `launch_app` | Launch your Tauri application |
+| `close_app` | Close the running application |
+| `capture_screenshot` | Take a screenshot (returns base64 PNG) |
+| `click_element` | Click UI elements by CSS selector |
+| `type_text` | Type into input fields |
+| `wait_for_element` | Wait for elements to appear |
+| `get_element_text` | Read text from elements |
+| `execute_tauri_command` | Call your Tauri IPC commands |
+| `get_app_state` | Check if app is running and get session info |
 
-Launch a Tauri application via tauri-driver.
+## Configuration
 
-**Parameters:**
-- `appPath` (string, required): Path to the Tauri application binary
-- `args` (string[], optional): Command-line arguments to pass to the app
-- `env` (object, optional): Environment variables to set
+Configure the server using environment variables:
 
-**Example:**
-```json
-{
-  "appPath": "/path/to/app/target/debug/my-app",
-  "args": ["--debug"],
-  "env": { "LOG_LEVEL": "debug" }
-}
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `TAURI_APP_PATH` | Path to your Tauri app binary | None (required in tool call or env) |
+| `TAURI_SCREENSHOT_DIR` | Where to save screenshots | `./screenshots` |
+| `TAURI_WEBDRIVER_PORT` | Port where tauri-driver runs | `4444` |
+| `TAURI_DEFAULT_TIMEOUT` | Element wait timeout in ms | `5000` |
+| `TAURI_DRIVER_PATH` | Path to tauri-driver binary | `tauri-driver` |
+
+### Finding Your Tauri App Binary
+
+After building your Tauri app, the binary is located at:
+
+- **Development build**: `your-tauri-project/src-tauri/target/debug/your-app-name`
+- **Release build**: `your-tauri-project/src-tauri/target/release/your-app-name`
+- **macOS apps**: Add `.app` extension (e.g., `your-app-name.app`)
+- **Windows apps**: Add `.exe` extension
+
+Build your app first:
+```bash
+cd your-tauri-project
+cargo build  # or: cargo build --release
 ```
 
-### close_app
+## Usage Examples
 
-Close the currently running Tauri application gracefully.
+### Basic Testing Workflow
 
-**Parameters:** None
+```
+You: Launch my calculator app and test the addition feature
 
-### capture_screenshot
-
-Capture a screenshot of the application window.
-
-**Parameters:**
-- `filename` (string, optional): Filename without extension (will be saved as PNG)
-- `returnBase64` (boolean, optional): Return base64 data (true) or save to file (false). Default: `true`
-
-**Returns:** Base64-encoded PNG image data or file path
-
-### click_element
-
-Click a UI element identified by a CSS selector.
-
-**Parameters:**
-- `selector` (string, required): CSS selector (e.g., `"#button-id"`, `".button-class"`, `"button[name=submit]"`)
-
-### type_text
-
-Type text into an input field or editable element.
-
-**Parameters:**
-- `selector` (string, required): CSS selector for the input element
-- `text` (string, required): Text to type
-- `clear` (boolean, optional): Clear existing text first. Default: `false`
-
-### wait_for_element
-
-Wait for an element to appear in the DOM. Useful for handling async UI states.
-
-**Parameters:**
-- `selector` (string, required): CSS selector to wait for
-- `timeout` (number, optional): Timeout in milliseconds. Default: `5000`
-
-### get_element_text
-
-Get the text content of an element.
-
-**Parameters:**
-- `selector` (string, required): CSS selector for the element
-
-**Returns:** Text content of the element
-
-### execute_tauri_command
-
-Execute a Tauri IPC command. The command must be exposed in your Tauri app's `src-tauri/src/main.rs` file.
-
-**Parameters:**
-- `command` (string, required): Name of the Tauri command
-- `args` (object, optional): Arguments to pass to the command
-
-**Example:**
-```json
-{
-  "command": "get_user_data",
-  "args": { "userId": 123 }
-}
+Claude will:
+1. Launch the app using launch_app
+2. Wait for the UI to load with wait_for_element
+3. Click buttons and type numbers
+4. Capture screenshots to verify results
+5. Report back with findings
 ```
 
-### get_app_state
+### Debugging UI Issues
 
-Get the current state of the application.
+```
+You: Take a screenshot of my app's settings page
 
-**Parameters:** None
+Claude will:
+1. Check if app is running (or launch it)
+2. Navigate to settings (if needed)
+3. Capture and display the screenshot
+```
 
-**Returns:**
-- `isRunning`: Whether the app is currently running
-- `appPath`: Path to the running application
-- `sessionId`: WebDriver session ID
-- `pageTitle`: Current page title (if running)
-- `pageUrl`: Current page URL (if running)
+### Testing Tauri Commands
+
+```
+You: Call the save_preferences command with theme='dark' and verify it worked
+
+Claude will:
+1. Use execute_tauri_command to call your Rust backend
+2. Verify the response
+3. Optionally check the UI updated correctly
+```
 
 ## Architecture
 
 ```
 ┌─────────────────┐
-│   Claude Code   │
-│   (MCP Client)  │
+│   Claude Code   │  Ask in natural language
 └────────┬────────┘
          │ MCP Protocol (stdio)
-         │
 ┌────────▼────────────────┐
-│  MCP Tauri Automation   │
+│  MCP Tauri Automation   │  Translate to automation commands
 │       Server            │
-│  ┌──────────────────┐   │
-│  │  Tool Handlers   │   │
-│  ├──────────────────┤   │
-│  │  TauriDriver     │   │
-│  │   (Wrapper)      │   │
-│  └─────────┬────────┘   │
-└────────────┼────────────┘
-             │ WebDriver Protocol
-             │
-┌────────────▼────────┐
-│   tauri-driver      │
-│  (WebDriver Server) │
-└────────────┬────────┘
-             │
-┌────────────▼────────┐
-│   Tauri App         │
-│  (Desktop App)      │
-└─────────────────────┘
+└────────┬────────────────┘
+         │ WebDriver Protocol
+┌────────▼────────┐
+│   tauri-driver  │  Control the application
+└────────┬────────┘
+         │
+┌────────▼────────┐
+│   Your Tauri    │  Desktop app being tested
+│      App        │
+└─────────────────┘
 ```
-
-### Components
-
-1. **MCP Server** (`src/index.ts`): Main entry point, handles MCP protocol communication
-2. **TauriDriver** (`src/tauri-driver.ts`): Wrapper around WebDriverIO for Tauri app automation
-3. **Tool Implementations** (`src/tools/`): Individual tool handlers for each MCP tool
-4. **Type Definitions** (`src/types.ts`): TypeScript interfaces and types
 
 ## Troubleshooting
 
-### tauri-driver not starting
+### "Failed to launch application: connect ECONNREFUSED"
 
-**Error:** `Failed to launch application: connect ECONNREFUSED`
+**Solution**: Make sure `tauri-driver` is running before using the MCP server.
 
-**Solution:** Ensure tauri-driver is running before starting the MCP server:
 ```bash
+# In a separate terminal
 tauri-driver
 ```
 
-### Application not launching
+### "Element not found: #my-button"
 
-**Error:** `Failed to launch application: application path not found`
+**Solutions**:
+1. Use `wait_for_element` first for dynamically loaded content
+2. Verify the selector in your browser DevTools (Tauri apps use web technologies)
+3. Increase timeout for slow-loading UIs
 
-**Solutions:**
-1. Verify the app path is correct and the binary exists
-2. Ensure the binary is executable: `chmod +x /path/to/app`
-3. For macOS, use the `.app` bundle path
-4. For development builds, use the debug binary: `target/debug/app-name`
+### "Application path not found"
 
-### Element not found errors
+**Solutions**:
+1. Build your Tauri app first: `cargo build`
+2. Use absolute path to the binary
+3. Make sure the binary is executable: `chmod +x /path/to/app`
+4. On macOS, use the `.app` bundle path
 
-**Error:** `Element not found: #my-button`
+### Port conflicts (Port 4444 already in use)
 
-**Solutions:**
-1. Use `wait_for_element` before interacting with dynamically loaded elements
-2. Verify the selector using browser DevTools
-3. Check if the element is in a shadow DOM (Tauri apps may use web components)
-4. Increase timeout for slow-loading UIs
+**Solution**: Use a custom port:
 
-### Screenshots not working
-
-**Error:** `Screenshot capture failed`
-
-**Solutions:**
-1. Ensure the screenshots directory exists and is writable
-2. Check that the app is actually running (`get_app_state`)
-3. Verify the WebDriver session is active
-
-### Tauri commands not executing
-
-**Error:** `Failed to execute Tauri command`
-
-**Solutions:**
-1. Verify the command is registered in `src-tauri/src/main.rs`:
-   ```rust
-   #[tauri::command]
-   fn my_command(arg: String) -> String {
-       format!("Received: {}", arg)
-   }
-
-   fn main() {
-       tauri::Builder::default()
-           .invoke_handler(tauri::generate_handler![my_command])
-           .run(tauri::generate_context!())
-           .expect("error while running tauri application");
-   }
-   ```
-2. Ensure the command name matches exactly (case-sensitive)
-3. Check that arguments match the expected types
-
-### Port conflicts
-
-**Error:** `Port 4444 already in use`
-
-**Solution:** Use a different port:
 ```bash
-# Start tauri-driver on custom port
+# Start tauri-driver on different port
 tauri-driver --port 4445
-
-# Update environment variable
-TAURI_WEBDRIVER_PORT=4445
 ```
 
-## Examples
+Then update your MCP config:
+```json
+{
+  "env": {
+    "TAURI_WEBDRIVER_PORT": "4445"
+  }
+}
+```
 
-### Basic Workflow
+### Screenshots not appearing
 
-```typescript
-// 1. Launch app
-await launch_app({
-  appPath: "/path/to/app/target/debug/my-app"
-});
+**Solutions**:
+1. Ensure the app is actually running: ask Claude to check with `get_app_state`
+2. Check that the screenshots directory exists and is writable
+3. For base64 screenshots (default), ensure your MCP client supports image display
 
-// 2. Wait for UI to load
-await wait_for_element({
-  selector: "#main-content",
-  timeout: 10000
-});
+## How It Works
 
-// 3. Interact with UI
-await click_element({
-  selector: "button.start-button"
-});
+This server uses the WebDriver protocol to control Tauri applications. Here's what happens:
 
-await type_text({
-  selector: "input[name='search']",
-  text: "test query",
-  clear: true
-});
+1. **tauri-driver** acts as a WebDriver server for Tauri apps
+2. **This MCP server** translates Claude's requests into WebDriver commands
+3. **WebDriverIO** handles the low-level WebDriver communication
+4. **Your Tauri app** responds to automation commands
 
-// 4. Capture state
-const screenshot = await capture_screenshot({
-  filename: "after-interaction"
-});
+The server maintains a single active session and ensures proper cleanup when closing apps or on shutdown.
 
-const text = await get_element_text({
-  selector: ".result-text"
-});
+## Advanced Usage
 
-// 5. Execute custom command
-await execute_tauri_command({
-  command: "save_data",
-  args: { data: "test" }
-});
+### Calling Custom Tauri Commands
 
-// 6. Clean up
-await close_app();
+First, expose commands in your `src-tauri/src/main.rs`:
+
+```rust
+#[tauri::command]
+fn get_user_data(user_id: i32) -> Result<String, String> {
+    Ok(format!("User {}", user_id))
+}
+
+fn main() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![get_user_data])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+```
+
+Then ask Claude:
+```
+Execute the get_user_data command with user_id 123
+```
+
+### Multiple Test Runs
+
+The server can launch and close apps multiple times in a session:
+
+```
+Launch the app, test feature A, close it.
+Launch again, test feature B, close it.
 ```
 
 ## Development
 
-### Building
-
 ```bash
+# Build
 npm run build
-```
 
-### Watching for changes
-
-```bash
+# Watch mode
 npm run watch
+
+# Project structure
+src/
+├── index.ts          # MCP server entry point
+├── tauri-driver.ts   # WebDriver wrapper
+├── types.ts          # TypeScript types
+└── tools/
+    ├── launch.ts     # App lifecycle
+    ├── screenshot.ts # Screenshot capture
+    ├── interact.ts   # UI interaction
+    └── state.ts      # State & IPC commands
 ```
 
-### Project Structure
+## Requirements
 
-```
-mcp-tauri-automation/
-├── src/
-│   ├── index.ts          # MCP server entry point
-│   ├── tauri-driver.ts   # WebDriver wrapper
-│   ├── types.ts          # TypeScript types
-│   └── tools/
-│       ├── launch.ts     # App lifecycle tools
-│       ├── screenshot.ts # Screenshot capture
-│       ├── interact.ts   # UI interaction tools
-│       └── state.ts      # State management tools
-├── dist/                 # Compiled JavaScript (generated)
-├── screenshots/          # Screenshot output (generated)
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-## Contributing
-
-Contributions are welcome! Please ensure:
-1. TypeScript compiles without errors (`npm run build`)
-2. Code follows the existing style
-3. Add tests for new features (when test framework is added)
+- **Node.js** 18+
+- **Rust/Cargo** (for tauri-driver)
+- **tauri-driver** installed and running
+- A **built Tauri application** to test
 
 ## License
 
@@ -461,6 +321,5 @@ MIT
 ## Acknowledgments
 
 - Built with [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/sdk)
-- Uses [WebDriverIO](https://webdriver.io/) for browser automation
-- Designed for [Tauri](https://tauri.app/) applications
-- Created for use with [Claude Code](https://claude.ai/)
+- Powered by [WebDriverIO](https://webdriver.io/)
+- Made for [Tauri](https://tauri.app/) applications
