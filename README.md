@@ -2,6 +2,10 @@
 
 > **Automate Tauri desktop apps with AI.** An MCP server that lets Claude Code test, debug, and interact with your Tauri applications through natural language.
 
+<a href="https://glama.ai/mcp/servers/@Radek44/mcp-tauri-automation">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Radek44/mcp-tauri-automation/badge" alt="Tauri Automation MCP server" />
+</a>
+
 ## What is this?
 
 Testing Tauri apps usually means:
