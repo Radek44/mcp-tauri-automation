@@ -19,6 +19,7 @@
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.17",
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
