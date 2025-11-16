@@ -16,6 +16,25 @@ With this MCP server:
 - ✅ Test UI flows through natural language
 - ✅ Automate repetitive testing while you code
 
+## 🎯 Try the Demo!
+
+We've built a complete **Recipe Book demo app** to showcase all features. Get started in 5 minutes:
+
+```bash
+# Quick setup
+cd test-harness/scripts
+./setup.sh
+
+# Start services
+tauri-driver                    # Terminal 1
+cd demo-app && npm run tauri dev  # Terminal 2
+
+# Try interactive scenarios
+open test-harness/scenarios/01-getting-started.md
+```
+
+**👉 See [demo-app/README.md](demo-app/README.md) for full details.**
+
 ## Quick Start
 
 **1. Install tauri-driver**
@@ -168,6 +187,35 @@ Claude will:
 3. Optionally check the UI updated correctly
 ```
 
+## 📦 Demo App & Test Harness
+
+This project includes a complete testing framework:
+
+### Recipe Book Demo App
+A fully-featured Tauri application showcasing automation capabilities:
+- 🍳 6 sample recipes with search, filtering, and favorites
+- 🎨 Beautiful UI with Tailwind CSS and Framer Motion
+- ⚙️ Comprehensive Tauri commands (CRUD, filters, async operations)
+- 🧪 Test-friendly with data-testid on all elements
+
+**[📖 Demo App Documentation →](demo-app/README.md)**
+
+### Test Harness
+A complete testing suite with:
+- 📝 **7 Interactive Scenarios** - Step-by-step guides for testing different features
+- ⚙️ **Configuration Templates** - Ready-to-use configs for Claude Code/Desktop
+- 🔧 **Setup Scripts** - Automated environment setup and verification
+- 🤖 **Automated Tests** - E2E tests for CI/CD integration
+
+**[📖 Test Harness Documentation →](test-harness/README.md)**
+
+### Quick Links
+- [Getting Started Scenario](test-harness/scenarios/01-getting-started.md)
+- [UI Automation Scenario](test-harness/scenarios/02-ui-automation.md)
+- [Tauri Commands Scenario](test-harness/scenarios/05-tauri-commands.md)
+- [Setup Script](test-harness/scripts/setup.sh)
+- [Verification Script](test-harness/scripts/verify.sh)
+
 ## Architecture
 
 ```
@@ -186,7 +234,7 @@ Claude will:
          │
 ┌────────▼────────┐
 │   Your Tauri    │  Desktop app being tested
-│      App        │
+│      App        │  (or our Recipe Book demo!)
 └─────────────────┘
 ```
 

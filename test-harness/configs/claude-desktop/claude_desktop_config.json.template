@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "tauri-automation": {
+      "command": "node",
+      "args": [
+        "{{MCP_SERVER_PATH}}/dist/index.js"
+      ],
+      "env": {
+        "TAURI_DRIVER_URL": "http://localhost:4444"
+      }
+    }
+  }
+}
