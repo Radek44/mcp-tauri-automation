@@ -35,17 +35,33 @@ npm install && npm run build
 <details>
 <summary><b>Claude Code (Recommended)</b></summary>
 
-Use the Claude Code CLI to register the server:
+Use the Claude Code CLI to register the server. Choose between **stdio** (local process) or **JSON** format:
+
+**Option 1: Stdio transport (recommended for most users)**
 
 ```bash
-# Basic registration with environment variable
-claude mcp add tauri-automation \
-  -e TAURI_APP_PATH=/path/to/your/tauri/app/target/debug/your-app \
+# Add server with stdio transport
+claude mcp add --transport stdio tauri-automation \
+  --env TAURI_APP_PATH=/path/to/your/tauri/app/target/debug/your-app \
   --scope user \
   -- node /absolute/path/to/mcp-tauri-automation/dist/index.js
 
-# Or use JSON format for more complex configurations
+# With multiple environment variables
+claude mcp add --transport stdio tauri-automation \
+  --env TAURI_APP_PATH=/path/to/your/tauri/app/target/debug/your-app \
+  --env TAURI_SCREENSHOT_DIR=./screenshots \
+  --env TAURI_DEFAULT_TIMEOUT=5000 \
+  --scope user \
+  -- node /absolute/path/to/mcp-tauri-automation/dist/index.js
+```
+
+> **Note**: The `--` (double dash) separates Claude CLI flags from the server command. Everything before `--` are options for Claude (like `--env`, `--scope`), and everything after `--` is the actual command to run the MCP server.
+
+**Option 2: JSON format (for advanced configurations)**
+
+```bash
 claude mcp add-json tauri-automation '{
+  "type": "stdio",
   "command": "node",
   "args": ["/absolute/path/to/mcp-tauri-automation/dist/index.js"],
   "env": {
@@ -56,27 +72,25 @@ claude mcp add-json tauri-automation '{
 }'
 ```
 
-**Verify installation:**
+**Scope options:**
+- `--scope local` (default): Available only to you in the current project
+- `--scope project`: Shared with everyone in the project via `.mcp.json` file (committed to git)
+- `--scope user`: Available to you across all projects
+
+**Managing servers:**
 ```bash
-# List all registered MCP servers
+# List all configured servers
 claude mcp list
 
-# Check server connection status
-# Inside Claude Code, use: /mcp
-```
+# Get details for a specific server
+claude mcp get tauri-automation
 
-**Additional commands:**
-```bash
 # Remove a server
 claude mcp remove tauri-automation
 
-# Test server connection
-claude mcp get tauri-automation
+# Inside Claude Code, check server status
+/mcp
 ```
-
-**Scope options:**
-- `--scope user` or `-s user`: Available in all projects (recommended)
-- `--scope project` or `-s project`: Available only in current project
 
 </details>
 
