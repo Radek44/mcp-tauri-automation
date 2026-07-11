@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "profile": "standard",
+  "traits": [
+    "multi-agent",
+    "hosted-delegation"
+  ],
+  "verify": {
+    "quick": {
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "timeout_seconds": 120
+    },
+    "full": {
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "timeout_seconds": 120
+    }
+  },
+  "exceptions": []
+}

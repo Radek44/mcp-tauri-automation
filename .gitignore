@@ -140,3 +140,9 @@ screenshots/
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Agent OS session-local state
+.claude/handoff.md
+.claude/settings.local.json
+.claude/worktrees/
+.agentos/state/
