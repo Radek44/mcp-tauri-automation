@@ -13,12 +13,13 @@ export async function clickElement(
   params: ElementSelector
 ): Promise<ToolResponse<{ message: string }>> {
   try {
-    await driver.clickElement(params.selector);
+    const button = params.button ?? 'left';
+    await driver.clickElement(params.selector, button);
 
     return {
       success: true,
       data: {
-        message: `Clicked element: ${params.selector}`,
+        message: `${button === 'left' ? 'Clicked' : `${button}-clicked`} element: ${params.selector}`,
       },
     };
   } catch (error) {

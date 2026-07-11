@@ -230,7 +230,7 @@ Launch my calculator app at ~/projects/calculator/target/debug/calculator and te
 | `launch_app` | Launch your Tauri application |
 | `close_app` | Close the running application |
 | `capture_screenshot` | Take a screenshot (returns base64 PNG) |
-| `click_element` | Click UI elements by CSS selector |
+| `click_element` | Click UI elements by CSS selector (`button: "left" \| "right" \| "middle"`, default `left`; use `right` to open context menus) |
 | `type_text` | Type into input fields |
 | `wait_for_element` | Wait for elements to appear |
 | `get_element_text` | Read text from elements |

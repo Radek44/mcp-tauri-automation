@@ -64,6 +64,8 @@ export interface ScreenshotParams {
 export interface ElementSelector {
   /** CSS selector string */
   selector: string;
+  /** Mouse button to click with. Defaults to 'left'. */
+  button?: 'left' | 'right' | 'middle';
 }
 
 /**

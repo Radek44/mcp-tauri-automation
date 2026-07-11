@@ -115,9 +115,14 @@ export class TauriDriver {
   }
 
   /**
-   * Click an element by CSS selector
+   * Click an element by CSS selector.
+   * `button` selects the mouse button ('left' | 'right' | 'middle'); right/middle
+   * go through the WebDriver Actions API so context menus fire.
    */
-  async clickElement(selector: string): Promise<void> {
+  async clickElement(
+    selector: string,
+    button: 'left' | 'right' | 'middle' = 'left'
+  ): Promise<void> {
     this.ensureAppRunning();
 
     const element = await this.appState.browser!.$(selector);
@@ -125,7 +130,7 @@ export class TauriDriver {
       throw new Error(`Element not found: ${selector}`);
     }
 
-    await element.click();
+    await element.click({ button });
   }
 
   /**

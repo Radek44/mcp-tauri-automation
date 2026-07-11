@@ -101,13 +101,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'click_element',
-        description: 'Click a UI element identified by a CSS selector',
+        description: 'Click a UI element identified by a CSS selector. Use button:"right" to open context menus.',
         inputSchema: {
           type: 'object',
           properties: {
             selector: {
               type: 'string',
               description: 'CSS selector to identify the element to click (e.g., "#button-id", ".button-class", "button[name=submit]")',
+            },
+            button: {
+              type: 'string',
+              enum: ['left', 'right', 'middle'],
+              description: 'Mouse button to click with. Defaults to "left". Use "right" for a context-menu (right) click.',
             },
           },
           required: ['selector'],
