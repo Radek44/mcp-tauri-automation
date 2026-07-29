@@ -89,6 +89,16 @@ export interface WaitForElementParams {
 }
 
 /**
+ * Wait for navigation parameters
+ */
+export interface WaitForNavigationParams {
+  /** Optional substring the URL must contain. If omitted, waits for any URL change. */
+  urlContains?: string;
+  /** Timeout in milliseconds. Default: 5000 */
+  timeout?: number;
+}
+
+/**
  * Execute Tauri command parameters
  */
 export interface ExecuteTauriCommandParams {
@@ -96,6 +106,16 @@ export interface ExecuteTauriCommandParams {
   command: string;
   /** Arguments to pass to the command */
   args?: Record<string, unknown>;
+}
+
+/**
+ * Execute script parameters
+ */
+export interface ExecuteScriptParams {
+  /** JavaScript code to execute */
+  script: string;
+  /** Optional arguments accessible as arguments[0], arguments[1], etc. */
+  args?: unknown[];
 }
 
 /**

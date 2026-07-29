@@ -16,8 +16,8 @@ import {
 import { TauriDriver } from './tauri-driver.js';
 import { launchApp, closeApp, getAppState } from './tools/launch.js';
 import { captureScreenshot } from './tools/screenshot.js';
-import { clickElement, typeText, waitForElement, getElementText } from './tools/interact.js';
-import { executeTauriCommand } from './tools/state.js';
+import { clickElement, typeText, waitForElement, waitForNavigation, getElementText } from './tools/interact.js';
+import { executeTauriCommand, executeScript, getPageTitle, getPageUrl } from './tools/state.js';
 import type { TauriAutomationConfig } from './types.js';
 
 // Parse config from environment variables
@@ -156,6 +156,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: 'wait_for_navigation',
+        description: 'Wait for a page navigation to complete. Can wait for any URL change or for the URL to contain a specific substring.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            urlContains: {
+              type: 'string',
+              description: 'Optional substring the URL must contain. If omitted, waits for any URL change from the current URL.',
+            },
+            timeout: {
+              type: 'number',
+              description: 'Timeout in milliseconds. Default: 5000',
+              default: 5000,
+            },
+          },
+        },
+      },
+      {
         name: 'get_element_text',
         description: 'Get the text content of an element',
         inputSchema: {
@@ -186,6 +204,41 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ['command'],
+        },
+      },
+      {
+        name: 'execute_script',
+        description: 'Execute arbitrary JavaScript in the application context and return the result',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            script: {
+              type: 'string',
+              description: 'JavaScript code to execute. Use "return" to get a value back.',
+            },
+            args: {
+              type: 'array',
+              description: 'Optional arguments accessible as arguments[0], arguments[1], etc.',
+              items: {},
+            },
+          },
+          required: ['script'],
+        },
+      },
+      {
+        name: 'get_page_title',
+        description: 'Get the current page title of the application',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'get_page_url',
+        description: 'Get the current page URL of the application',
+        inputSchema: {
+          type: 'object',
+          properties: {},
         },
       },
       {
@@ -295,6 +348,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      case 'wait_for_navigation': {
+        const result = await waitForNavigation(driver, args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
       case 'get_element_text': {
         const result = await getElementText(driver, args as any);
         return {
@@ -309,6 +374,42 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'execute_tauri_command': {
         const result = await executeTauriCommand(driver, args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'execute_script': {
+        const result = await executeScript(driver, args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_page_title': {
+        const result = await getPageTitle(driver);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_page_url': {
+        const result = await getPageUrl(driver);
         return {
           content: [
             {

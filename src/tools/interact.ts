@@ -3,7 +3,7 @@
  */
 
 import type { TauriDriver } from '../tauri-driver.js';
-import type { ElementSelector, TypeTextParams, WaitForElementParams, ToolResponse } from '../types.js';
+import type { ElementSelector, TypeTextParams, WaitForElementParams, WaitForNavigationParams, ToolResponse } from '../types.js';
 
 /**
  * Click an element by CSS selector
@@ -67,6 +67,33 @@ export async function waitForElement(
       success: true,
       data: {
         message: `Element found: ${params.selector}`,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Wait for navigation (URL change or URL matching a pattern)
+ */
+export async function waitForNavigation(
+  driver: TauriDriver,
+  params: WaitForNavigationParams = {}
+): Promise<ToolResponse<{ url: string; message: string }>> {
+  try {
+    const url = await driver.waitForNavigation(params);
+
+    return {
+      success: true,
+      data: {
+        url,
+        message: params.urlContains
+          ? `Navigation complete, URL contains "${params.urlContains}": ${url}`
+          : `Navigation complete, URL changed to: ${url}`,
       },
     };
   } catch (error) {
