@@ -6,19 +6,20 @@ import type { TauriDriver } from '../tauri-driver.js';
 import type { ElementSelector, TypeTextParams, WaitForElementParams, ToolResponse } from '../types.js';
 
 /**
- * Click an element by CSS selector
+ * Click an element
  */
 export async function clickElement(
   driver: TauriDriver,
   params: ElementSelector
 ): Promise<ToolResponse<{ message: string }>> {
   try {
-    await driver.clickElement(params.selector);
+    await driver.clickElement(params.selector, params.by);
 
+    const strategy = params.by || 'css';
     return {
       success: true,
       data: {
-        message: `Clicked element: ${params.selector}`,
+        message: `Clicked element (${strategy}): ${params.selector}`,
       },
     };
   } catch (error) {
@@ -37,7 +38,7 @@ export async function typeText(
   params: TypeTextParams
 ): Promise<ToolResponse<{ message: string }>> {
   try {
-    await driver.typeText(params.selector, params.text, params.clear);
+    await driver.typeText(params.selector, params.text, params.clear, params.by);
 
     return {
       success: true,
@@ -61,7 +62,7 @@ export async function waitForElement(
   params: WaitForElementParams
 ): Promise<ToolResponse<{ message: string }>> {
   try {
-    await driver.waitForElement(params.selector, params.timeout);
+    await driver.waitForElement(params.selector, params.timeout, params.by);
 
     return {
       success: true,
@@ -85,7 +86,7 @@ export async function getElementText(
   params: ElementSelector
 ): Promise<ToolResponse<{ text: string }>> {
   try {
-    const text = await driver.getElementText(params.selector);
+    const text = await driver.getElementText(params.selector, params.by);
 
     return {
       success: true,

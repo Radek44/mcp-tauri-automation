@@ -17,7 +17,7 @@ import { TauriDriver } from './tauri-driver.js';
 import { launchApp, closeApp, getAppState } from './tools/launch.js';
 import { captureScreenshot } from './tools/screenshot.js';
 import { clickElement, typeText, waitForElement, getElementText } from './tools/interact.js';
-import { executeTauriCommand } from './tools/state.js';
+import { executeTauriCommand, executeScript, getPageTitle, getPageUrl } from './tools/state.js';
 import type { TauriAutomationConfig } from './types.js';
 
 // Parse config from environment variables
@@ -101,13 +101,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'click_element',
-        description: 'Click a UI element identified by a CSS selector',
+        description: 'Click a UI element identified by a selector. Supports CSS selectors, XPath, exact text match, and partial text match.',
         inputSchema: {
           type: 'object',
           properties: {
             selector: {
               type: 'string',
-              description: 'CSS selector to identify the element to click (e.g., "#button-id", ".button-class", "button[name=submit]")',
+              description: 'Selector to identify the element. For CSS: "#id", ".class". For XPath: "//button[@name=\'submit\']". For text: "Submit". For partial_text: "Subm".',
+            },
+            by: {
+              type: 'string',
+              enum: ['css', 'xpath', 'text', 'partial_text'],
+              description: 'Selector strategy. Default: "css"',
+              default: 'css',
             },
           },
           required: ['selector'],
@@ -121,7 +127,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             selector: {
               type: 'string',
-              description: 'CSS selector to identify the input element',
+              description: 'Selector to identify the input element',
             },
             text: {
               type: 'string',
@@ -131,6 +137,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: 'boolean',
               description: 'Whether to clear existing text before typing. Default: false',
               default: false,
+            },
+            by: {
+              type: 'string',
+              enum: ['css', 'xpath', 'text', 'partial_text'],
+              description: 'Selector strategy. Default: "css"',
+              default: 'css',
             },
           },
           required: ['selector', 'text'],
@@ -144,12 +156,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             selector: {
               type: 'string',
-              description: 'CSS selector to wait for',
+              description: 'Selector to wait for',
             },
             timeout: {
               type: 'number',
               description: 'Timeout in milliseconds. Default: 5000',
               default: 5000,
+            },
+            by: {
+              type: 'string',
+              enum: ['css', 'xpath', 'text', 'partial_text'],
+              description: 'Selector strategy. Default: "css"',
+              default: 'css',
             },
           },
           required: ['selector'],
@@ -163,7 +181,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             selector: {
               type: 'string',
-              description: 'CSS selector to identify the element',
+              description: 'Selector to identify the element',
+            },
+            by: {
+              type: 'string',
+              enum: ['css', 'xpath', 'text', 'partial_text'],
+              description: 'Selector strategy. Default: "css"',
+              default: 'css',
             },
           },
           required: ['selector'],
@@ -186,6 +210,41 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ['command'],
+        },
+      },
+      {
+        name: 'execute_script',
+        description: 'Execute arbitrary JavaScript in the application context and return the result',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            script: {
+              type: 'string',
+              description: 'JavaScript code to execute. Use "return" to get a value back.',
+            },
+            args: {
+              type: 'array',
+              description: 'Optional arguments accessible as arguments[0], arguments[1], etc.',
+              items: {},
+            },
+          },
+          required: ['script'],
+        },
+      },
+      {
+        name: 'get_page_title',
+        description: 'Get the current page title of the application',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'get_page_url',
+        description: 'Get the current page URL of the application',
+        inputSchema: {
+          type: 'object',
+          properties: {},
         },
       },
       {
@@ -309,6 +368,42 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'execute_tauri_command': {
         const result = await executeTauriCommand(driver, args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'execute_script': {
+        const result = await executeScript(driver, args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_page_title': {
+        const result = await getPageTitle(driver);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case 'get_page_url': {
+        const result = await getPageUrl(driver);
         return {
           content: [
             {
