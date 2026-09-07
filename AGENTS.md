@@ -9,10 +9,11 @@ portable across supported desktop environments.
 
 ## Layout
 
-- `src/index.ts` — MCP server setup, tool schemas, dispatch, and shutdown.
+- `src/index.ts` — stdio entry point, configuration, and shutdown.
+- `src/server.ts` — validated MCP tool schemas, bounded queue, and dispatch.
 - `src/tauri-driver.ts` — WebDriver session and Tauri process lifecycle.
-- `src/tools/` — bounded tool handlers for launch, interaction, screenshots,
-  state, and cleanup.
+- `src/ui-snapshot.ts` — fixed, read-only, bounded DOM diagnostic.
+- `test/` — Node tests with local fake WebDriver servers and real MCP transports.
 - `src/types.ts` — shared configuration, parameter, state, and response types.
 - `dist/` — generated TypeScript output; never edit or commit it.
 
@@ -20,15 +21,16 @@ portable across supported desktop environments.
 
 ```bash
 npm ci
-npm run build
+npm run verify
 ```
 
-The strict TypeScript build is the only repository-provided automated gate.
-There is currently no test or lint command; do not invent passing coverage.
-Use targeted compilation while iterating and run `npm run build` once from the
-final source before committing. A live automation smoke additionally requires
-`tauri-driver` and a built Tauri application, so report it as unrun when those
-external prerequisites are unavailable.
+The full gate builds, tests, audits runtime dependencies, and dry-runs packaging.
+Use targeted tests while iterating and run the full gate on final source before
+publication. Native smoke requires a built Tauri test app and either embedded
+WebDriver or tauri-driver. Report unavailable native platforms as untested.
+Create sessions only on loopback, serialize calls, never automatically replay
+mutations, and delete only sessions owned by this server. Embedded app processes
+remain owned by their launcher. Keep snapshots bounded and omit form values.
 
 ## Model Routing
 

@@ -1,0 +1,11 @@
+# Replace the two absolute paths. No app launches until explicitly requested.
+[mcp_servers.tauri-automation]
+command = "/absolute/path/to/node"
+args = ["/absolute/path/to/mcp-tauri-automation/dist/index.js"]
+enabled_tools = ["connect_app", "close_app", "get_app_state", "inspect_ui", "click_element", "type_text", "wait_for_element", "get_element_text", "capture_screenshot"]
+tool_timeout_sec = 70
+
+[mcp_servers.tauri-automation.env]
+TAURI_DEFAULT_TIMEOUT = "5000"
+# Set this to the port of your isolated embedded test app.
+TAURI_WEBDRIVER_PORT = "4445"
