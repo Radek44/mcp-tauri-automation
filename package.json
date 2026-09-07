@@ -1,17 +1,32 @@
 {
   "name": "mcp-tauri-automation",
-  "version": "1.0.0",
+  "version": "2.0.0-rc.1",
   "description": "MCP server for automating and interacting with Tauri desktop applications",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
     "mcp-tauri-automation": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "examples",
+    "scripts/smoke.mjs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Radek44/mcp-tauri-automation.git"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "verify": "npm test && npm audit --omit=dev && npm pack --dry-run",
     "watch": "tsc --watch",
     "prepare": "npm run build",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "smoke": "node scripts/smoke.mjs"
   },
   "keywords": [
     "mcp",
@@ -23,15 +38,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "webdriverio": "^9.2.14",
-    "zod": "^3.23.8"
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.19.0",
     "typescript": "^5.7.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   }
 }
