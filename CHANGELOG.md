@@ -21,6 +21,28 @@ approved retaining the nine existing tools and adding only `connect_app` and
   traversal/overwrites, silent failed state probes, and Tauri 2 invocation.
 - Add protocol/lifecycle tests, CI on Node 22/24, and a repeatable native probe.
 
+### Native validation — September 7, 2026
+
+The merged PR #11 runtime passed on macOS 26.6.2 arm64 with Node 24.18.0
+against an isolated, current-source Saga/Vuea Tauri development build:
+
+- Six-call native probe: connect, live state, bounded snapshot, PNG, close,
+  and closed state.
+- Nineteen-call interaction flow: visible first-run UI, dialog click, clear
+  and append typing, template creation, rendered title/revision assertions,
+  bounded snapshot without form values, PNG, session deletion, and reconnect.
+- Screenshot review confirmed a populated document and no conspicuous
+  clipping at the tested window size.
+- Closing a session left the caller-owned app alive; the test launcher then
+  stopped its exact process and confirmed the loopback listener was gone.
+
+An initial test-harness assertion selected the draft-status label instead of
+the revision control. It failed and was preserved; correcting that selector
+and repeating against fresh test data passed without a runtime code change.
+See the [sanitized validation receipt](https://github.com/Radek44/mcp-tauri-automation/blob/main/docs/validation/2.0.0-rc.1-macos.md).
+This is development-tool evidence, not Saga milestone acceptance, an app-restart
+persistence test, or Linux/Windows native certification.
+
 ### Migration and limits
 
 - Upgrade Node 18/20 clients to Node 22 or later.

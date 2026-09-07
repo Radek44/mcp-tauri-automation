@@ -7,6 +7,10 @@ inspect a bounded UI snapshot, click/type/wait, and capture a screenshot.
 embedded WebDriver server (including macOS) and the external tauri-driver flow.
 This is a release candidate; see [CHANGELOG.md](CHANGELOG.md) for compatibility
 changes and the distinction between automated protocol tests and native proof.
+The embedded flow passed a native macOS arm64 smoke on September 7, 2026,
+including click/type, screenshot capture, and session reconnection. Linux and
+Windows native acceptance remains unverified; see the
+[validation receipt](https://github.com/Radek44/mcp-tauri-automation/blob/main/docs/validation/2.0.0-rc.1-macos.md).
 
 ## Install
 
