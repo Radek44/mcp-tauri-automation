@@ -34,9 +34,12 @@ remain owned by their launcher. Keep snapshots bounded and omit form values.
 
 ## Model Routing
 
-- Use hosted subscription roles only: `opus` for architecture or MCP contract
-  changes, `sonnet` for ordinary implementation, and `haiku` for bounded
-  mechanical work.
+- Keep the base model and reasoning effort operator-selected; new tasks inherit
+  the operator's current Codex selection.
+- Use hosted Agent OS role aliases from `~/ai-agent-os/config/model-registry.json`:
+  `mechanical`, `implementer`, `evidence`, `verifier`, `architect`, `adversary`,
+  and the opt-in `frontier`. Select a role only when its scope and verification
+  needs fit.
 - Do not use local LLMs for repository work. Do not delegate generic work to
   DGX Spark; Spark is not a cheap or default agent lane.
 - Native subagents inherit the current model unless a delegation receipt proves
@@ -58,5 +61,5 @@ remain owned by their launcher. Keep snapshots bounded and omit form values.
 
 - Setup, supported tools, environment variables, and external prerequisites:
   `README.md`.
-- Hard-won repository gotchas: `.claude/lessons.md`.
+- Hard-won repository gotchas: `.agents/lessons.md`.
 - Cross-repository governance: `~/ai-agent-os/docs/`.
