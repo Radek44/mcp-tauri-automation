@@ -32,8 +32,11 @@ class FakeDriver {
   async typeText(selector, text, clear) {
     this.calls.push(["type", selector, text, clear]);
   }
-  async waitForElement(selector, timeout, state) {
-    this.calls.push(["wait", selector, timeout, state]);
+  async focusElement(selector) {
+    this.calls.push(["focus", selector]);
+  }
+  async waitForElement(selector, timeout, state, conditions) {
+    this.calls.push(["wait", selector, timeout, state, conditions]);
   }
   async getElementText(selector) {
     this.calls.push(["text", selector]);
@@ -72,6 +75,36 @@ async function connected(driver = new FakeDriver()) {
 function envelope(response) {
   return JSON.parse(response.content[0].text);
 }
+
+test("cancelling a queued MCP mutation prevents later driver execution", async () => {
+  const { driver, server, client } = await connected();
+  let started, release;
+  const active = new Promise(resolve => { started = resolve; });
+  driver.clickElement = async () => {
+    driver.calls.push(["click-start"]);
+    started();
+    await new Promise(resolve => { release = resolve; });
+    driver.calls.push(["click-end"]);
+  };
+  try {
+    const first = client.callTool({ name: "click_element", arguments: { selector: "#block" } });
+    await active;
+    const controller = new AbortController();
+    const second = client.callTool({ name: "type_text", arguments: { selector: "#input", text: "cancelled" } }, undefined, { signal: controller.signal });
+    const cancellation = assert.rejects(second);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    controller.abort();
+    await cancellation;
+    release();
+    await first;
+    await client.callTool({ name: "get_app_state", arguments: {} });
+    assert.equal(driver.calls.some(([name]) => name === "type"), false);
+  } finally {
+    release?.();
+    await shutdownServer(server);
+    await client.close();
+  }
+});
 
 test("arbitrary clicks are conservatively annotated as potentially destructive", async () => {
   const { server, client } = await connected();
@@ -114,11 +147,11 @@ test("health probes never overlap commands within the same WebDriver session", a
   }
 });
 
-test("catalog exposes eleven bounded tools and applies defaults", async () => {
+test("catalog exposes twelve bounded tools and applies defaults", async () => {
   const { driver, server, client } = await connected();
   try {
     const list = await client.listTools();
-    assert.equal(list.tools.length, 11);
+    assert.equal(list.tools.length, 12);
     assert.ok(list.tools.some((tool) => tool.name === "connect_app"));
     await client.callTool({ name: "inspect_ui", arguments: {} });
     assert.deepEqual(driver.calls.at(-1), [
@@ -134,6 +167,7 @@ test("catalog exposes eleven bounded tools and applies defaults", async () => {
       "#ok",
       undefined,
       "attached",
+      undefined,
     ]);
   } finally {
     await shutdownServer(server);
@@ -236,11 +270,14 @@ test("an uncertain connection is an error even when no local session is tracked"
   }
 });
 
-test("tool calls share a queue and shutdown waits before session cleanup", async () => {
+test("tool calls preserve arrival order across asynchronous schema validation", async () => {
   const { driver, server, client } = await connected();
   let release;
+  let started;
+  const clickStarted = new Promise(resolve => { started = resolve; });
   driver.clickElement = async () => {
     driver.calls.push(["click-start"]);
+    started();
     await new Promise((resolve) => {
       release = resolve;
     });
@@ -255,7 +292,7 @@ test("tool calls share a queue and shutdown waits before session cleanup", async
       name: "get_element_text",
       arguments: { selector: "#b" },
     });
-    await new Promise((resolve) => setImmediate(resolve));
+    await clickStarted;
     assert.deepEqual(driver.calls, [["click-start"]]);
     release();
     await Promise.all([first, second]);
@@ -264,6 +301,90 @@ test("tool calls share a queue and shutdown waits before session cleanup", async
       ["click-start", "click-end", "text"],
     );
   } finally {
+    release?.();
+    await shutdownServer(server);
+    await client.close();
+  }
+});
+
+test("new MCP contracts validate before driver invocation and forward focus and predicates", async () => {
+  const { driver, server, client } = await connected();
+  try {
+    for (const [name, args] of [
+      ["capture_screenshot", { timeout: 0 }],
+      ["capture_screenshot", { timeout: 60001 }],
+      ... ["left", "right", "middle", "extra"].map(button => ["click_element", { selector: "#ok", button }]),
+      ["wait_for_element", { selector: "#ok", conditions: {} }],
+      ["wait_for_element", { selector: "#ok", conditions: { script: "return true" } }],
+      ["wait_for_element", { selector: "#ok", state: "hidden", conditions: { enabled: true } }],
+    ]) {
+      const response = await client.callTool({ name, arguments: args });
+      assert.equal(response.isError, true);
+    }
+    assert.equal(driver.calls.length, 0);
+    await client.callTool({ name: "focus_element", arguments: { selector: "#ok" } });
+    assert.deepEqual(driver.calls.at(-1), ["focus", "#ok"]);
+    const conditions = { textEquals: "Saved", enabled: true, ariaBusy: false };
+    await client.callTool({ name: "wait_for_element", arguments: { selector: "#ok", timeout: 100, state: "visible", conditions } });
+    assert.deepEqual(driver.calls.at(-1), ["wait", "#ok", 100, "visible", conditions]);
+  } finally {
+    await shutdownServer(server);
+    await client.close();
+  }
+});
+
+test("shutdown drains active work, rejects new work, and closes the session once", async () => {
+  const { driver, server, client } = await connected();
+  let release, started;
+  const active = new Promise(resolve => { started = resolve; });
+  driver.clickElement = async () => {
+    driver.calls.push(["click-start"]);
+    started();
+    await new Promise(resolve => { release = resolve; });
+    driver.calls.push(["click-end"]);
+  };
+  try {
+    const click = client.callTool({ name: "click_element", arguments: { selector: "#block" } });
+    await active;
+    const draining = shutdownServer(server);
+    const rejected = await client.callTool({ name: "type_text", arguments: { selector: "#input", text: "late" } });
+    assert.equal(rejected.isError, true);
+    assert.match(envelope(rejected).error, /shutting down/);
+    assert.deepEqual(driver.calls, [["click-start"]]);
+    release();
+    await Promise.all([click, draining, shutdownServer(server)]);
+    assert.deepEqual(driver.calls, [["click-start"], ["click-end"], ["close"]]);
+  } finally {
+    release?.();
+    await shutdownServer(server);
+    await client.close();
+  }
+});
+
+test("cancellation after input starts never replays or interrupts driver cleanup", async () => {
+  const { driver, server, client } = await connected();
+  let release, started;
+  const active = new Promise(resolve => { started = resolve; });
+  driver.clickElement = async () => {
+    driver.calls.push(["click-start"]);
+    started();
+    await new Promise(resolve => { release = resolve; });
+    driver.calls.push(["click-end"]);
+  };
+  try {
+    const controller = new AbortController();
+    const click = client.callTool({ name: "click_element", arguments: { selector: "#block" } }, undefined, { signal: controller.signal });
+    const cancelled = assert.rejects(click);
+    await active;
+    controller.abort();
+    await cancelled;
+    const draining = shutdownServer(server);
+    assert.deepEqual(driver.calls, [["click-start"]]);
+    release();
+    await draining;
+    assert.deepEqual(driver.calls, [["click-start"], ["click-end"], ["close"]]);
+  } finally {
+    release?.();
     await shutdownServer(server);
     await client.close();
   }

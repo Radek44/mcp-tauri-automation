@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Tauri MCP Native Fixture",
+  "version": "0.1.0",
+  "identifier": "dev.tauri-mcp.native-fixture",
+  "build": { "frontendDist": "../ui" },
+  "app": {
+    "windows": [{ "label": "main", "title": "Tauri MCP Native Fixture", "width": 960, "height": 720 }],
+    "security": { "csp": "default-src 'self'; script-src 'self'; style-src 'self'" }
+  },
+  "bundle": { "active": false }
+}

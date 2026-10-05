@@ -60,6 +60,7 @@ const elements = Array.from(nodes).slice(0, limit).map(el => {
     testId: bound(el.getAttribute('data-testid')), text: bound(text),
     textTruncated: text.length > maxTextLength, nameTruncated: name.length > maxTextLength,
     enabled: !el.matches(':disabled') && el.getAttribute('aria-disabled') !== 'true' && !el.closest('[inert]'),
+    focused: document.activeElement === el,
     ...g
   };
 });

@@ -4,11 +4,13 @@ import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import type {
   AppState,
+  ElementConditions,
   InspectUiParams,
   LaunchAppParams,
   TauriAutomationConfig,
 } from "./types.js";
 import { INSPECT_UI_SCRIPT } from "./ui-snapshot.js";
+import { ELEMENT_CONDITIONS_SCRIPT, FOCUS_ELEMENT_SCRIPT } from "./ui-interaction.js";
 
 const ELEMENT_KEY = "element-6066-11e4-a52e-4f735466cecf";
 const MAX_RESPONSE_BYTES = 1024 * 1024;
@@ -300,11 +302,23 @@ export class TauriDriver {
 
   async clickElement(selector: string): Promise<void> {
     const element = await this.findElement(selector);
-    await this.request(
-      "POST",
-      this.sessionPath("/element/" + element + "/click"),
-      {},
-    );
+    await this.request("POST", this.sessionPath("/element/" + element + "/click"), {});
+  }
+
+  async focusElement(selector: string): Promise<void> {
+    const value = await this.request("POST", this.sessionPath("/execute/sync"), {
+      script: FOCUS_ELEMENT_SCRIPT, args: [selector],
+    });
+    if (isRecord(value) && value.reason === "focused") return;
+    const messages: Record<string, string> = {
+      not_found: "Focus target was not found.",
+      ambiguous: "Focus selector matched multiple elements; use a unique selector.",
+      disabled: "Focus target is disabled or inert.",
+      hidden: "Focus target is hidden.",
+      not_focusable: "Target did not receive focus; choose a focusable public control.",
+    };
+    const reason = isRecord(value) && typeof value.reason === "string" ? value.reason : "";
+    throw new Error(Object.hasOwn(messages, reason) ? messages[reason] : "Invalid focus response.");
   }
 
   async typeText(selector: string, text: string, clear = false): Promise<void> {
@@ -326,16 +340,32 @@ export class TauriDriver {
     selector: string,
     timeout = this.config.defaultTimeout,
     state: "attached" | "visible" | "hidden" = "attached",
+    conditions?: ElementConditions,
   ): Promise<void> {
     integerInRange(timeout, "Timeout", 1, 60000);
+    if (conditions !== undefined) {
+      if (state === "hidden") throw new Error("Element conditions cannot accompany hidden state.");
+      if (!isRecord(conditions) || !Object.keys(conditions).length ||
+          Object.keys(conditions).some(key => !["textEquals", "enabled", "ariaBusy"].includes(key)) ||
+          (conditions.textEquals !== undefined && (typeof conditions.textEquals !== "string" || conditions.textEquals.length > 12000)) ||
+          (conditions.enabled !== undefined && typeof conditions.enabled !== "boolean") ||
+          (conditions.ariaBusy !== undefined && typeof conditions.ariaBusy !== "boolean"))
+        throw new Error("Invalid element conditions.");
+    }
     const deadline = Date.now() + timeout;
+    const remaining = () => {
+      const value = deadline - Date.now();
+      if (value <= 0) throw new Error("Element conditions were not reached within " + timeout + "ms. Use inspect_ui for diagnostics.");
+      return value;
+    };
     for (;;) {
       let found = false;
       let visible = false;
+      let conditionsMatch = conditions === undefined;
       try {
         const element = await this.findElement(
           selector,
-          Math.max(1, deadline - Date.now()),
+          remaining(),
         );
         found = true;
         if (state !== "attached") {
@@ -345,8 +375,17 @@ export class TauriDriver {
               this.sessionPath("/element/" + element + "/displayed"),
               undefined,
               undefined,
-              Math.max(1, deadline - Date.now()),
+              remaining(),
             )) === true;
+        }
+        if (conditions !== undefined && (state !== "visible" || visible)) {
+          const observation = await this.request("POST", this.sessionPath("/execute/sync"), {
+            script: ELEMENT_CONDITIONS_SCRIPT,
+            args: [{ [ELEMENT_KEY]: decodeURIComponent(element) }, conditions],
+          }, undefined, remaining());
+          if (!isRecord(observation) || typeof observation.matches !== "boolean")
+            throw new Error("Invalid element-condition response.");
+          conditionsMatch = observation.matches;
         }
       } catch (error) {
         if (!(
@@ -357,8 +396,8 @@ export class TauriDriver {
         found = false;
       }
       if (
-        (state === "attached" && found) ||
-        (state === "visible" && visible) ||
+        (state === "attached" && found && conditionsMatch) ||
+        (state === "visible" && visible && conditionsMatch) ||
         (state === "hidden" && (!found || !visible))
       )
         return;
@@ -417,7 +456,9 @@ export class TauriDriver {
   async captureScreenshot(
     filename?: string,
     returnBase64 = false,
+    timeout?: number,
   ): Promise<string> {
+    if (timeout !== undefined) integerInRange(timeout, "Screenshot timeout", 1, 60000);
     if (
       filename !== undefined &&
       !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,119}$/.test(filename)
@@ -429,6 +470,9 @@ export class TauriDriver {
     const screenshot = await this.request(
       "GET",
       this.sessionPath("/screenshot"),
+      undefined,
+      undefined,
+      timeout,
     );
     if (
       typeof screenshot !== "string" ||

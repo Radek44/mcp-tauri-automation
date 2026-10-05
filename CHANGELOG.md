@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.0.0-rc.2
+
+- Add unique-target focus and focused state in bounded inspection.
+- Add bounded public-text, enabled, and explicit aria-busy wait predicates with
+  fresh element lookup and one shared deadline.
+- Adapt the per-call screenshot timeout proposed by Daniel in [#7](https://github.com/Radek44/mcp-tauri-automation/pull/7)
+  to the abortable direct-WebDriver transport; omission keeps the configured
+  default and invalid deadlines fail before dispatch.
+- Preserve arrival order across asynchronous MCP validation, skip cancelled
+  queued work, and drain active work before owned-session cleanup.
+- Update fast-uri and ip-address lockfile resolutions for reported advisories.
+- Add an isolated native fixture and embedded/external Linux acceptance harness.
+  Right/middle clicks from #9 remain deferred after native WebKit emitted an
+  unintended primary click. Button fields are rejected before driver dispatch.
+- Keep arbitrary scripts, XPath and navigation-change waits outside this scope.
+  Existing contributor discussions document the decisions and remaining work.
+
+### Native validation — October 5, 2026
+
+Linux ARM64 acceptance passed against the final rc.2 runtime: 10 embedded and
+9 external assertions covering real focus, state predicates, screenshot deadlines,
+session cleanup and rejected button overrides without input. Embedded reconnect
+preserved same-process state. Exact source, binary and compiled-module hashes
+are in the [embedded receipt](docs/validation/2.0.0-rc.2-linux-embedded.json) and
+[external receipt](docs/validation/2.0.0-rc.2-linux-external.json).
+This synthetic fixture does not establish product acceptance or macOS/Windows
+support for the new capabilities.
+
 ## 2.0.0-rc.1
 
 Release candidate for a smaller local Tauri automation server. Contract review
