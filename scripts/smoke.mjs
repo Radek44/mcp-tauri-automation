@@ -46,7 +46,7 @@ async function call(name, args = {}) {
 try {
   await client.connect(transport);
   const catalog = await client.listTools();
-  assert.equal(catalog.tools.length, 11);
+  assert.equal(catalog.tools.length, 12);
   const connected = await call("connect_app");
   const state = await call("get_app_state");
   assert.equal(state.isRunning, true);

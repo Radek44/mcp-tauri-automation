@@ -64,7 +64,7 @@ test(
     t.after(() => client.close());
     await client.connect(transport);
     const listed = await client.listTools();
-    assert.equal(listed.tools.length, 11);
+    assert.equal(listed.tools.length, 12);
     const connected = await client.callTool({
       name: "connect_app",
       arguments: {},

@@ -1,0 +1,478 @@
+{
+  "status": "pass",
+  "at": "2026-10-05T10:10:16.301Z",
+  "command": [
+    "/home/radek/.nvm/versions/node/v24.21.0/bin/node",
+    "<implementation-worktrees>/tauri-native/scripts/native-acceptance.mjs",
+    "--mcp-root",
+    "../tauri-mcp",
+    "--mode",
+    "embedded"
+  ],
+  "platform": "linux",
+  "architecture": "arm64",
+  "node": "v24.21.0",
+  "mode": "embedded",
+  "embeddedPlugin": "tauri-plugin-wdio-webdriver =1.2.0",
+  "output": "/tmp/tauri-native-acceptance-Fj1zgY",
+  "calls": [
+    {
+      "name": "connect_app",
+      "arguments": {},
+      "elapsedMs": 496,
+      "success": true
+    },
+    {
+      "name": "get_app_state",
+      "arguments": {},
+      "elapsedMs": 32,
+      "success": true
+    },
+    {
+      "name": "wait_for_element",
+      "arguments": {
+        "selector": "#fixture-version",
+        "conditions": {
+          "textEquals": "fixture-v1"
+        },
+        "timeout": 5000
+      },
+      "elapsedMs": 7,
+      "success": true
+    },
+    {
+      "name": "inspect_ui",
+      "arguments": {
+        "selector": "button, input",
+        "limit": 20,
+        "maxTextLength": 80
+      },
+      "elapsedMs": 9,
+      "success": true
+    },
+    {
+      "name": "click_element",
+      "arguments": {
+        "selector": "#activate"
+      },
+      "elapsedMs": 6,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#activation-count"
+      },
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "click_element",
+      "arguments": {
+        "selector": "#replace-status"
+      },
+      "elapsedMs": 7,
+      "success": true
+    },
+    {
+      "name": "wait_for_element",
+      "arguments": {
+        "selector": "#async-status",
+        "conditions": {
+          "textEquals": "Ready",
+          "ariaBusy": false
+        },
+        "timeout": 5000
+      },
+      "elapsedMs": 453,
+      "success": true
+    },
+    {
+      "name": "wait_for_element",
+      "arguments": {
+        "selector": "#after-ready",
+        "conditions": {
+          "enabled": true
+        },
+        "timeout": 5000
+      },
+      "elapsedMs": 9,
+      "success": true
+    },
+    {
+      "name": "wait_for_element",
+      "arguments": {
+        "selector": "#async-status",
+        "conditions": {
+          "textEquals": "Impossible"
+        },
+        "timeout": 150
+      },
+      "elapsedMs": 151,
+      "success": false,
+      "isError": true,
+      "error": "Element conditions were not reached within 150ms. Use inspect_ui for diagnostics."
+    },
+    {
+      "name": "focus_element",
+      "arguments": {
+        "selector": "#offscreen-focus"
+      },
+      "elapsedMs": 10,
+      "success": true
+    },
+    {
+      "name": "inspect_ui",
+      "arguments": {
+        "selector": "#offscreen-focus",
+        "limit": 1
+      },
+      "elapsedMs": 7,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#focus-status"
+      },
+      "elapsedMs": 7,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#focus-activation-count"
+      },
+      "elapsedMs": 6,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#input-count"
+      },
+      "elapsedMs": 8,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#note-mirror"
+      },
+      "elapsedMs": 7,
+      "success": true
+    },
+    {
+      "name": "focus_element",
+      "arguments": {
+        "selector": "#disabled"
+      },
+      "elapsedMs": 7,
+      "success": false,
+      "isError": true,
+      "error": "Focus target is disabled or inert."
+    },
+    {
+      "name": "focus_element",
+      "arguments": {
+        "selector": "#not-focusable"
+      },
+      "elapsedMs": 5,
+      "success": false,
+      "isError": true,
+      "error": "Target did not receive focus; choose a focusable public control."
+    },
+    {
+      "name": "click_element",
+      "arguments": {
+        "selector": "#mouse-target",
+        "button": "left"
+      },
+      "elapsedMs": 1,
+      "success": false,
+      "isError": true,
+      "validationError": "MCP error -32602: Input validation error: Invalid arguments for tool click_element: Unrecognized key(s) in object: 'button'"
+    },
+    {
+      "name": "click_element",
+      "arguments": {
+        "selector": "#mouse-target",
+        "button": "middle"
+      },
+      "elapsedMs": 1,
+      "success": false,
+      "isError": true,
+      "validationError": "MCP error -32602: Input validation error: Invalid arguments for tool click_element: Unrecognized key(s) in object: 'button'"
+    },
+    {
+      "name": "click_element",
+      "arguments": {
+        "selector": "#mouse-target",
+        "button": "right"
+      },
+      "elapsedMs": 1,
+      "success": false,
+      "isError": true,
+      "validationError": "MCP error -32602: Input validation error: Invalid arguments for tool click_element: Unrecognized key(s) in object: 'button'"
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#right-count"
+      },
+      "elapsedMs": 6,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#middle-count"
+      },
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#context-count"
+      },
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#aux-count"
+      },
+      "elapsedMs": 5,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#left-click-count"
+      },
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#mouse-trace"
+      },
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "capture_screenshot",
+      "arguments": {
+        "filename": "native-embedded",
+        "returnBase64": false,
+        "timeout": 10000
+      },
+      "elapsedMs": 34,
+      "success": true
+    },
+    {
+      "name": "close_app",
+      "arguments": {},
+      "elapsedMs": 1,
+      "success": true
+    },
+    {
+      "name": "get_app_state",
+      "arguments": {},
+      "elapsedMs": 1,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#fixture-version"
+      },
+      "elapsedMs": 0,
+      "success": false,
+      "isError": true,
+      "error": "No active session. Use launch_app or connect_app first."
+    },
+    {
+      "name": "connect_app",
+      "arguments": {},
+      "elapsedMs": 4,
+      "success": true
+    },
+    {
+      "name": "get_app_state",
+      "arguments": {},
+      "elapsedMs": 6,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#activation-count"
+      },
+      "elapsedMs": 5,
+      "success": true
+    },
+    {
+      "name": "get_element_text",
+      "arguments": {
+        "selector": "#async-status"
+      },
+      "elapsedMs": 6,
+      "success": true
+    },
+    {
+      "name": "close_app",
+      "arguments": {},
+      "elapsedMs": 1,
+      "success": true
+    }
+  ],
+  "assertions": [
+    "bounded snapshot preserves duplicate buttons, disabled state and form-value omission",
+    "one ordinary click yields one activation",
+    "predicate wait observes replaced status, busy=false and enabled control",
+    "unmet predicate returns a bounded failure",
+    "explicit focus reaches off-screen button without activation or input changes",
+    "disabled and non-focusable controls do not report focus success",
+    "unsupported button fields fail validation without any mouse event or activation",
+    "per-call screenshot deadline returns a nonempty native PNG",
+    "closed session cannot read UI",
+    "embedded close leaves app alive and reconnect preserves same-process state"
+  ],
+  "processes": [
+    {
+      "label": "xvfb",
+      "pid": 2334340,
+      "command": "Xvfb",
+      "args": [
+        "-displayfd",
+        "3",
+        "-screen",
+        "0",
+        "1280x960x24",
+        "-nolisten",
+        "tcp"
+      ]
+    },
+    {
+      "label": "fixture",
+      "pid": 2334343,
+      "command": "<implementation-worktrees>/tauri-native/test/native-fixture/src-tauri/target/debug/tauri-mcp-native-fixture",
+      "args": []
+    }
+  ],
+  "cleanup": [
+    {
+      "label": "fixture",
+      "pid": 2334343,
+      "exitCode": null,
+      "signal": "SIGTERM"
+    },
+    {
+      "label": "xvfb",
+      "pid": 2334340,
+      "exitCode": 0,
+      "signal": null
+    }
+  ],
+  "limitations": [
+    "Dedicated synthetic fixture; not Saga or BeaverCraft product acceptance.",
+    "Session reconnect is not process restart persistence.",
+    "No native file picker, clipboard, OS shortcut, visual quality or cross-platform proof.",
+    "Embedded events may be synthetic; external mouse assertions are reported separately."
+  ],
+  "fixture": {
+    "head": "cb0252a524bf13397db42bdee7edeaffec412afc",
+    "files": [
+      "scripts/native-acceptance.mjs",
+      "test/native-fixture/.gitignore",
+      "test/native-fixture/src-tauri/Cargo.lock",
+      "test/native-fixture/src-tauri/Cargo.toml",
+      "test/native-fixture/src-tauri/build.rs",
+      "test/native-fixture/src-tauri/icons/icon.png",
+      "test/native-fixture/src-tauri/src/main.rs",
+      "test/native-fixture/src-tauri/tauri.conf.json",
+      "test/native-fixture/ui/fixture.js",
+      "test/native-fixture/ui/index.html",
+      "test/native-fixture/ui/style.css"
+    ],
+    "sourceSha256": "9db1030666bcd78c15d16dc67ebf1b5eeded290519c2f464fcf7521fb3a1dd78",
+    "dirty": true
+  },
+  "mcp": {
+    "head": "5aef3dbc2b72e10e4ea576140d9cd74b16cba91a",
+    "files": [
+      "package-lock.json",
+      "package.json",
+      "scripts/build.mjs",
+      "src/index.ts",
+      "src/server.ts",
+      "src/tauri-driver.ts",
+      "src/types.ts",
+      "src/ui-interaction.ts",
+      "src/ui-snapshot.ts",
+      "tsconfig.json"
+    ],
+    "sourceSha256": "f3251ae3de60d424f30910c6bc249e15e3ce3fad95ac44acec504d6279418595",
+    "dirty": true
+  },
+  "binary": {
+    "path": "<implementation-worktrees>/tauri-native/test/native-fixture/src-tauri/target/debug/tauri-mcp-native-fixture",
+    "sha256": "ed939262ea6d98418a082e1cb6ac37b755ff62ad827688e5ebfda628dba58043"
+  },
+  "entry": {
+    "path": "<implementation-worktrees>/tauri-mcp/dist/index.js",
+    "sha256": "c6e18d3f4f9d926d9be70f2325427ee2c9fd9efb32fe07e18912cadb9e2c3a9b"
+  },
+  "compiledModules": [
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/index.js",
+      "sha256": "c6e18d3f4f9d926d9be70f2325427ee2c9fd9efb32fe07e18912cadb9e2c3a9b"
+    },
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/server.js",
+      "sha256": "cd0fdbf51ffc63b9b94b9d01c00198772ddd6caacb192590a7a663e59445a0b6"
+    },
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/tauri-driver.js",
+      "sha256": "abe4c7dcfc3a9323146aa6dbf5f39895966b36ed4f01a02f44d1aff2b4ba93b8"
+    },
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/types.js",
+      "sha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+    },
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/ui-interaction.js",
+      "sha256": "8c7a5fb7365e649e388b7b555eca82cdd67e265dae5cd64412c993cf6db2b980"
+    },
+    {
+      "path": "<implementation-worktrees>/tauri-mcp/dist/ui-snapshot.js",
+      "sha256": "e48f9360dbdb7c372077ff81d395481cb46aa98f91b004d0d1019ea34ab9e621"
+    }
+  ],
+  "lockfile": {
+    "path": "<implementation-worktrees>/tauri-native/test/native-fixture/src-tauri/Cargo.lock",
+    "sha256": "8e272d9a445afe4170939695bc4e1e49e058377d645371f494256c023d57c26c"
+  },
+  "port": 35191,
+  "display": ":1",
+  "sessions": [
+    "c82fcb75-0929-492f-ac2c-b770cf44bacc",
+    "d0e018c9-bca5-4c2b-bbac-65e4eb5465b4"
+  ],
+  "screenshot": {
+    "path": "/tmp/tauri-native-acceptance-Fj1zgY/native-embedded.png",
+    "sha256": "b4ed49aba17d40d6cf28a39e5142c7bfe94568116f1d938f7022ebd32ee6da0f",
+    "width": 960,
+    "height": 720,
+    "viewport": {
+      "height": 720,
+      "width": 960
+    }
+  },
+  "stderr": "MCP Tauri Automation server running on stdio\n",
+  "finishedAt": "2026-10-05T10:10:18.250Z"
+}

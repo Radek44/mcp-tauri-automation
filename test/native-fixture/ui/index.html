@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Native acceptance fixture</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="fixture.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Native acceptance fixture</h1>
+    <p id="fixture-version">fixture-v1</p>
+    <p>Temporary test state only. No account, network request or persistent document.</p>
+    <section aria-label="Public actions">
+      <button id="activate" type="button">Activate once</button>
+      <button id="disabled" type="button" disabled>Unavailable action</button>
+      <button id="duplicate-a" type="button">Duplicate label</button>
+      <button id="duplicate-b" type="button">Duplicate label</button>
+      <label for="note">Fixture note</label>
+      <input id="note" type="text" value="unchanged fixture value">
+      <p>Activation count: <output id="activation-count">0</output></p>
+      <p>Input events: <output id="input-count">0</output></p>
+    </section>
+    <section aria-label="Asynchronous state">
+      <button id="replace-status" type="button">Replace status asynchronously</button>
+      <p id="async-status" aria-busy="false">Idle</p>
+      <button id="after-ready" type="button" disabled>Ready action</button>
+    </section>
+    <section aria-label="Mouse events">
+      <button id="mouse-target" type="button">Mouse event target</button>
+      <p>Left: <output id="left-count">0</output>; middle: <output id="middle-count">0</output>;
+        right: <output id="right-count">0</output>; context menu: <output id="context-count">0</output>;
+        auxiliary: <output id="aux-count">0</output>; middle auxiliary: <output id="middle-aux-count">0</output>;
+        right auxiliary: <output id="right-aux-count">0</output></p>
+      <p>Last trusted event: <output id="trusted-event">none</output></p>
+      <p>Left click activations: <output id="left-click-count">0</output></p>
+      <p>Bounded event trace: <output id="mouse-trace">[]</output></p>
+    </section>
+    <div class="spacer" aria-hidden="true"></div>
+    <section aria-label="Off-screen focus">
+      <button id="offscreen-focus" type="button">Focus without activating</button>
+      <p>Focus: <output id="focus-status">not focused</output></p>
+      <p>Focus button activations: <output id="focus-activation-count">0</output></p>
+      <p>Fixture note value: <output id="note-mirror">unchanged fixture value</output></p>
+      <p id="not-focusable">This paragraph is not focusable.</p>
+    </section>
+  </main>
+</body>
+</html>

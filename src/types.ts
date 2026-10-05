@@ -26,6 +26,7 @@ export interface LaunchAppParams {
 export interface ScreenshotParams {
   filename?: string;
   returnBase64?: boolean;
+  timeout?: number;
 }
 export interface ElementSelector {
   selector: string;
@@ -37,6 +38,12 @@ export interface TypeTextParams extends ElementSelector {
 export interface WaitForElementParams extends ElementSelector {
   timeout?: number;
   state?: "attached" | "visible" | "hidden";
+  conditions?: ElementConditions;
+}
+export interface ElementConditions {
+  textEquals?: string;
+  enabled?: boolean;
+  ariaBusy?: boolean;
 }
 export interface InspectUiParams {
   selector?: string;

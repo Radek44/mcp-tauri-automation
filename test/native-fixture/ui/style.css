@@ -1,0 +1,10 @@
+:root { font-family: system-ui, sans-serif; color: #142035; background: #eef2f7; }
+body { margin: 24px; }
+main { max-width: 880px; margin: auto; }
+section { padding: 16px; margin: 16px 0; background: white; border: 1px solid #bac8d9; border-radius: 8px; }
+button, input { margin: 6px; padding: 10px; font: inherit; }
+button:focus-visible, input:focus-visible { outline: 4px solid #165de0; outline-offset: 3px; }
+button:disabled { opacity: .5; }
+label { display: block; }
+output { font-weight: 700; }
+.spacer { height: 900px; }

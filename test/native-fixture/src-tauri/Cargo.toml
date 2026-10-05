@@ -1,0 +1,17 @@
+[package]
+name = "tauri-mcp-native-fixture"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-wdio-webdriver = { version = "=1.2.0", optional = true }
+
+[features]
+default = []
+custom-protocol = ["tauri/custom-protocol"]
+native-acceptance = ["dep:tauri-plugin-wdio-webdriver"]

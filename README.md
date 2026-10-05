@@ -3,14 +3,14 @@
 A small local MCP server for testing Tauri desktop apps. Connect to a test app,
 inspect a bounded UI snapshot, click/type/wait, and capture a screenshot.
 
-**2.0.0-rc.1** requires Node.js 22 or newer. It supports an already running
+**2.0.0-rc.2** requires Node.js 22 or newer. It supports an already running
 embedded WebDriver server (including macOS) and the external tauri-driver flow.
 This is a release candidate; see [CHANGELOG.md](CHANGELOG.md) for compatibility
 changes and the distinction between automated protocol tests and native proof.
-The embedded flow passed a native macOS arm64 smoke on September 7, 2026,
-including click/type, screenshot capture, and session reconnection. Linux and
-Windows native acceptance remains unverified; see the
-[validation receipt](https://github.com/Radek44/mcp-tauri-automation/blob/main/docs/validation/2.0.0-rc.1-macos.md).
+The rc.2 candidate passed synthetic native acceptance on Linux ARM64 with both
+embedded and external drivers; see [native evidence](https://github.com/Radek44/mcp-tauri-automation/blob/main/test/native-fixture/ACCEPTANCE.md).
+The earlier rc.1 embedded flow passed a macOS arm64 Saga smoke on September 7,
+2026. Windows and the new rc.2 capabilities on macOS remain unverified.
 
 ## Install
 
@@ -82,14 +82,15 @@ Native process behavior ultimately belongs to that driver.
 | close_app | Delete the owned session. |
 | get_app_state | Session metadata and a live title/location probe; reports failed health checks. |
 | inspect_ui | Optional CSS selector, limit (1–100, default 20), maxTextLength (0–1000, default 160). |
-| click_element | CSS selector; standard WebDriver click. |
+| click_element | CSS selector only; standard primary WebDriver click. Button overrides are rejected. |
+| focus_element | One unique CSS target; scroll, focus and verify without typing or activation. |
 | type_text | selector, text, optional clear (false appends, true clears then types). |
-| wait_for_element | selector, optional timeout and state: attached (default), visible, or hidden. |
+| wait_for_element | selector, optional timeout and state: attached (default), visible, or hidden; optional conditions described below. |
 | get_element_text | CSS selector; maximum 12,000 characters, otherwise use a narrower selector. |
-| capture_screenshot | Native MCP PNG by default; returnBase64:false saves a local file. Optional basename filename. |
+| capture_screenshot | Native MCP PNG by default; returnBase64:false saves a local file. Optional basename filename and timeout (1–60,000 ms). |
 | execute_tauri_command | Compatibility/debug tool: command, optional args; requires an enabled global Tauri invoke bridge. |
 
-inspect_ui returns bounded text, role/name hints, enabled/visible state,
+inspect_ui returns bounded text, role/name hints, enabled/visible/focused state,
 viewport intersection, rectangles, and own/effective opacity. Truncation flags
 disclose omitted results. It does not return HTML, input values, application
 stores, or an accessibility-tree conformance claim. A screenshot is still
@@ -100,7 +101,24 @@ then use wait_for_element or a targeted read to confirm the result.
 Capture images when they answer a visual question. This reduces repetitive
 diagnostic calls and large DOM dumps; no measured model-token saving is claimed.
 
-All calls execute in order. Action requests are never automatically retried.
+For state waits, `conditions` accepts `textEquals`, `enabled`, and `ariaBusy`;
+all supplied conditions must match. Conditions cannot accompany `hidden`.
+Text concatenates public visible text nodes in DOM order, preserving inline
+adjacency, then normalizes whitespace. It excludes form/editable contents and
+is not a full rendered-text or accessibility algorithm. Each observation is
+bounded to 2,000 text nodes and 12,000 raw text characters, including excluded
+nodes; narrow the selector when that budget is insufficient. `ariaBusy:false`
+requires an explicit `aria-busy="false"`. Each poll reacquires the element,
+and all observations share one deadline.
+
+A screenshot timeout overrides the configured request timeout for that call
+only. Omitting it uses the configuration; zero does not mean unlimited.
+Right/middle clicks remain deferred: the tested native WebKit driver can emit
+an unintended primary click. See [native acceptance](test/native-fixture/ACCEPTANCE.md).
+
+All calls execute in arrival order, including schema validation. Cancellation
+while queued prevents execution; an input operation already started is allowed
+to finish and is never replayed. Action requests are never automatically retried.
 If an action times out, it may already have happened: inspect before retrying.
 If session creation has an unknown outcome, restart the isolated app/driver
 and this MCP server before creating another session. A failed session deletion
