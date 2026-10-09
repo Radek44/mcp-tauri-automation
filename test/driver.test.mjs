@@ -164,13 +164,11 @@ test("append versus clear uses W3C key input without replaying mutations", async
 });
 
 test("a timed-out action is attempted once and reports an unknown outcome", async (t) => {
-  const { driver, calls } = await fixture(
-    t,
-    async (c) => {
-      if (c.url.endsWith("/click")) await delay(120);
-    },
-    { defaultTimeout: 50 },
-  );
+  // The default timeout also bounds session start and element lookup: keep the fixture's 1000 ms and
+  // make only the click slower than it.
+  const { driver, calls } = await fixture(t, async (c) => {
+    if (c.url.endsWith("/click")) await delay(1200);
+  });
   await driver.connectApp();
   await assert.rejects(
     driver.clickElement("#button"),
