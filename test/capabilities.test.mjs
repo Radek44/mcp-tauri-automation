@@ -40,11 +40,13 @@ async function fixture(t, handler = () => undefined, config = {}) {
 }
 
 test("screenshot override uses an abortable request deadline without changing the configured default", async t => {
+  // The configured default bounds every request, session start included, so keep the fixture's 1000 ms
+  // default (enough for session setup on a loaded machine) and make the screenshot slower than it instead.
   const { driver, calls, output } = await fixture(t, async c => {
-    if (c.url.endsWith("/screenshot")) await delay(100);
-  }, { defaultTimeout: 50 });
+    if (c.url.endsWith("/screenshot")) await delay(1200);
+  });
   await driver.connectApp();
-  assert.equal(await driver.captureScreenshot(undefined, true, 500), PNG);
+  assert.equal(await driver.captureScreenshot(undefined, true, 5000), PNG);
   await assert.rejects(driver.captureScreenshot("timeout", false, 10), /timed out/);
   assert.deepEqual(await readdir(output), []);
   await assert.rejects(driver.captureScreenshot(undefined, true), /timed out/);
